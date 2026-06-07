@@ -440,6 +440,7 @@ GameObject:
   - component: {fileID: 583565193}
   - component: {fileID: 583565194}
   - component: {fileID: 583565195}
+  - component: {fileID: 583565196}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -494,6 +495,26 @@ MonoBehaviour:
   treesPerPatch: 12
   patchRadius: 0.2
   minTreeDistance: 0.01
+--- !u!114 &583565196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 583565192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1915d287414fe75489b807144a5420ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BirdManager
+  birdPrefab: {fileID: 8066048317270197343, guid: 0130f5c24650df145a439dea58f226bc, type: 3}
+  requiredTreeCount: 30
+  forestCheckRadius: 1.5
+  checkInterval: 2
+  maxBirds: 8
+  birdSpawnOffset: 0.01
+  birdsPerForest: 5
+  birdFlockRadius: 0.25
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
