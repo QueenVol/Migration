@@ -20,6 +20,9 @@ public class DeerManager : MonoBehaviour
     [Header("Habitat Requirement")]
     public int closeGrassRadius = 12;
 
+    [Header("Habitat Density Requirement")]
+    public float requiredGrassDensity = 0.35f;
+
 
     private float timer;
     private List<Vector3> spawnedWaterCenters = new List<Vector3>();
@@ -55,13 +58,55 @@ public class DeerManager : MonoBehaviour
 
             List<Vector2Int> grassPositions = GetGrassNearWater(mapX, mapY);
 
-            if (grassPositions.Count < requiredGrassPixels)
+            if (!HasEnoughGrassDensity(mapX, mapY, grassPositions))
                 continue;
 
             SpawnDeerHerd(grassPositions, waterWorldPos);
             spawnedWaterCenters.Add(waterWorldPos);
             return;
         }
+    }
+
+    bool HasEnoughGrassDensity(int waterX, int waterY, List<Vector2Int> grassPositions)
+    {
+        int totalCheckedPixels = 0;
+
+        for (int x = waterX - grassSearchRadius; x <= waterX + grassSearchRadius; x++)
+        {
+            for (int y = waterY - grassSearchRadius; y <= waterY + grassSearchRadius; y++)
+            {
+                if (!map.InBoundsPublic(x, y))
+                    continue;
+
+                float dist = Vector2.Distance(
+                    new Vector2(waterX, waterY),
+                    new Vector2(x, y)
+                );
+
+                if (dist > grassSearchRadius)
+                    continue;
+
+                if (map.GetTerrain(x, y) == ProceduralMapGenerator.TerrainType.Mountain ||
+                    map.GetTerrain(x, y) == ProceduralMapGenerator.TerrainType.River)
+                    continue;
+
+                totalCheckedPixels++;
+            }
+        }
+
+        if (totalCheckedPixels <= 0)
+            return false;
+
+        float density = grassPositions.Count / (float)totalCheckedPixels;
+
+        if (grassPositions.Count < requiredGrassPixels)
+            return false;
+
+        if (density < requiredGrassDensity)
+            return false;
+
+        Debug.Log($"鹿栖息地达标：草数量 {grassPositions.Count}, 草密度 {density:P0}");
+        return true;
     }
 
     bool HasCloseGrassAroundWater(int waterX, int waterY)

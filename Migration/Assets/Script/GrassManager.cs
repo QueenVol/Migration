@@ -19,6 +19,13 @@ public class GrassManager : MonoBehaviour
     [Header("Planting")]
     public float plantableGrassThreshold = 5f;
 
+    [Header("Lake Growth")]
+    public float lakeGrowthInterval = 5f;
+    public int lakeGrowthRadius = 10;
+    public float lakeGrassChance = 0.2f;
+
+    private float lakeGrowthTimer;
+
     private float[,] grassAmount;
 
     private void Start()
@@ -53,25 +60,80 @@ public class GrassManager : MonoBehaviour
         if (grassAmount == null)
             return;
 
-        //RegrowGrass();
+        lakeGrowthTimer += Time.deltaTime;
+
+        if (lakeGrowthTimer >= lakeGrowthInterval)
+        {
+            lakeGrowthTimer = 0f;
+            GrowGrassAroundLakes();
+        }
     }
 
-    void RegrowGrass()
+    void GrowGrassAroundLakes()
     {
+        int grassCreated = 0;
+
         for (int x = 0; x < map.Width; x++)
         {
             for (int y = 0; y < map.Height; y++)
             {
-                if (map.GetTerrain(x, y) != ProceduralMapGenerator.TerrainType.Grass)
+                if (map.GetTerrain(x, y) != ProceduralMapGenerator.TerrainType.River)
                     continue;
 
-                if (grassAmount[x, y] >= maxGrass)
-                    continue;
+                TryGrowGrassNearLake(x, y, ref grassCreated);
+            }
+        }
 
-                grassAmount[x, y] += regrowRate * Time.deltaTime;
-                grassAmount[x, y] = Mathf.Clamp(grassAmount[x, y], 0f, maxGrass);
+        if (grassCreated > 0)
+        {
+            map.ApplyTexture();
+            Debug.Log($"湖泊滋养草地：新增 {grassCreated} 格草");
+        }
+    }
 
-                UpdateGrassVisual(x, y);
+    void TryGrowGrassNearLake(int lakeX, int lakeY, ref int grassCreated)
+    {
+        for (int attempt = 0; attempt < 8; attempt++)
+        {
+            int x = lakeX + Random.Range(-lakeGrowthRadius, lakeGrowthRadius + 1);
+            int y = lakeY + Random.Range(-lakeGrowthRadius, lakeGrowthRadius + 1);
+
+            if (!map.InBoundsPublic(x, y))
+                continue;
+
+            float dist = Vector2.Distance(
+                new Vector2(lakeX, lakeY),
+                new Vector2(x, y)
+            );
+
+            if (dist > lakeGrowthRadius)
+                continue;
+
+            if (Random.value > lakeGrassChance)
+                continue;
+
+            var terrain = map.GetTerrain(x, y);
+
+            if (terrain == ProceduralMapGenerator.TerrainType.Mountain ||
+                terrain == ProceduralMapGenerator.TerrainType.River)
+                continue;
+
+            if (terrain == ProceduralMapGenerator.TerrainType.Barren)
+            {
+                map.SetTerrain(x, y, ProceduralMapGenerator.TerrainType.Grass);
+                grassAmount[x, y] = maxGrass;
+                grassCreated++;
+            }
+            else if (terrain == ProceduralMapGenerator.TerrainType.Grass)
+            {
+                if (grassAmount[x, y] < maxGrass)
+                {
+                    grassAmount[x, y] += maxGrass * 0.25f;
+                    grassAmount[x, y] = Mathf.Clamp(grassAmount[x, y], 0f, maxGrass);
+
+                    UpdateGrassVisual(x, y);
+                    grassCreated++;
+                }
             }
         }
     }

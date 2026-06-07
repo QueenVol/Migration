@@ -808,11 +808,14 @@ MonoBehaviour:
   map: {fileID: 295671494}
   grassManager: {fileID: 583565198}
   deerPrefab: {fileID: 5400619215411747971, guid: da20fbe41f50e20479c845cfd8c39ac7, type: 3}
-  maxDeer: 20
   spawnCheckInterval: 1
-  minDeerDistance: 0.3
   grassSearchRadius: 80
-  deerSpawnChancePercent: 100
+  requiredGrassPixels: 30
+  deerPerHerd: 5
+  herdSpawnRadius: 0.5
+  minDeerDistance: 0.3
+  closeGrassRadius: 12
+  requiredGrassDensity: 0.35
 --- !u!114 &583565198
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -833,6 +836,9 @@ MonoBehaviour:
   weakGrassColor: {r: 0.72, g: 0.72, b: 0.25, a: 1}
   barrenColor: {r: 0.6509804, g: 0.47843137, b: 0.2784314, a: 1}
   plantableGrassThreshold: 5
+  lakeGrowthInterval: 1
+  lakeGrowthRadius: 100
+  lakeGrassChance: 0.2
 --- !u!114 &583565199
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -848,7 +854,7 @@ MonoBehaviour:
   map: {fileID: 295671494}
   grassManager: {fileID: 583565198}
   grassPatchRadius: 0.7
-  lakeRadius: 0.45
+  lakeRadius: 0.5
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
