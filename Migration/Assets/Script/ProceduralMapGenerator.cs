@@ -17,9 +17,12 @@ public class ProceduralMapGenerator : MonoBehaviour
     public Color forestColor = new Color(0.05f, 0.35f, 0.12f);
     public Color barrenColor = new Color(0.62f, 0.45f, 0.25f);
 
+    public int Width => width;
+    public int Height => height;
+
     private TerrainType[,] terrainMap;
 
-    enum TerrainType
+    public enum TerrainType
     {
         Barren,
         Grass,
@@ -41,7 +44,6 @@ public class ProceduralMapGenerator : MonoBehaviour
         DrawMountainBorder();
         DrawRiver();
         DrawGrassPatches();
-        DrawSparseTrees();
 
         DrawTexture();
     }
@@ -137,32 +139,6 @@ public class ProceduralMapGenerator : MonoBehaviour
         }
     }
 
-    void DrawSparseTrees()
-    {
-        PlaceSingleTreesOnGrass(32);
-    }
-
-    void PlaceSingleTreesOnGrass(int treeCount)
-    {
-        int placed = 0;
-        int attempts = 0;
-        int maxAttempts = treeCount * 80;
-
-        while (placed < treeCount && attempts < maxAttempts)
-        {
-            attempts++;
-
-            int x = Random.Range(borderSize + 10, width - borderSize - 10);
-            int y = Random.Range(borderSize + 10, height - borderSize - 10);
-
-            if (terrainMap[x, y] != TerrainType.Grass)
-                continue;
-
-            PaintCircle(x, y, Random.Range(2, 4), TerrainType.Forest);
-            placed++;
-        }
-    }
-
     void PaintCircle(int cx, int cy, int radius, TerrainType type)
     {
         for (int x = cx - radius; x <= cx + radius; x++)
@@ -243,5 +219,13 @@ public class ProceduralMapGenerator : MonoBehaviour
             default:
                 return Color.magenta;
         }
+    }
+
+    public TerrainType GetTerrain(int x, int y)
+    {
+        if (!InBounds(x, y))
+            return TerrainType.Mountain;
+
+        return terrainMap[x, y];
     }
 }
