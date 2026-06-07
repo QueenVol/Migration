@@ -21,6 +21,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     public int Height => height;
 
     private TerrainType[,] terrainMap;
+    private Texture2D mapTexture;
 
     public enum TerrainType
     {
@@ -168,8 +169,8 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void DrawTexture()
     {
-        Texture2D texture = new Texture2D(width, height);
-        texture.filterMode = FilterMode.Point;
+        mapTexture = new Texture2D(width, height);
+        mapTexture.filterMode = FilterMode.Point;
 
         Color[] pixels = new Color[width * height];
 
@@ -181,11 +182,11 @@ public class ProceduralMapGenerator : MonoBehaviour
             }
         }
 
-        texture.SetPixels(pixels);
-        texture.Apply();
+        mapTexture.SetPixels(pixels);
+        mapTexture.Apply();
 
         Sprite sprite = Sprite.Create(
-            texture,
+            mapTexture,
             new Rect(0, 0, width, height),
             new Vector2(0.5f, 0.5f),
             32f
@@ -227,5 +228,43 @@ public class ProceduralMapGenerator : MonoBehaviour
             return TerrainType.Mountain;
 
         return terrainMap[x, y];
+    }
+
+    public bool InBoundsPublic(int x, int y)
+    {
+        return InBounds(x, y);
+    }
+
+    public Vector2Int WorldToMap(Vector3 worldPos)
+    {
+        int mapX = Mathf.RoundToInt(worldPos.x * 32 + width / 2);
+        int mapY = Mathf.RoundToInt(worldPos.y * 32 + height / 2);
+
+        return new Vector2Int(mapX, mapY);
+    }
+
+    public Vector3 MapToWorld(int mapX, int mapY)
+    {
+        float worldX = (mapX - width / 2f) / 32f;
+        float worldY = (mapY - height / 2f) / 32f;
+
+        return new Vector3(worldX, worldY, 0);
+    }
+
+    public void SetPixelColor(int x, int y, Color color)
+    {
+        if (mapTexture == null)
+            return;
+
+        if (!InBounds(x, y))
+            return;
+
+        mapTexture.SetPixel(x, y, color);
+    }
+
+    public void ApplyMapTexture()
+    {
+        if (mapTexture != null)
+            mapTexture.Apply();
     }
 }

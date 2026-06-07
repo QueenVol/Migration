@@ -103,7 +103,7 @@ public class BirdManager : MonoBehaviour
             Bird bird = birdObj.GetComponent<Bird>();
             bird.SetForestTrees(forestTrees);
             bird.map = map;
-            bird.treePrefab = treePrefab;
+            bird.treePrefab = treePrefab;   
         }
 
         Debug.Log("ÄñÈº³öÏÖ");
