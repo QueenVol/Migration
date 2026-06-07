@@ -4,6 +4,8 @@ using UnityEngine;
 public class BirdManager : MonoBehaviour
 {
     public GameObject birdPrefab;
+    public ProceduralMapGenerator map;
+    public GameObject treePrefab;
 
     [Header("Forest Requirement")]
     public int requiredTreeCount = 8;
@@ -40,19 +42,19 @@ public class BirdManager : MonoBehaviour
             if (AlreadySpawnedNear(center))
                 continue;
 
-            int nearbyTreeCount = CountTreesNear(center, allTrees);
+            List<Tree> nearbyTrees = GetTreesNear(center, allTrees);
 
-            if (nearbyTreeCount >= requiredTreeCount)
+            if (nearbyTrees.Count >= requiredTreeCount)
             {
-                SpawnBirdFlock(center);
+                SpawnBirdFlock(center, nearbyTrees);
                 spawnedForestCenters.Add(center);
             }
         }
     }
 
-    int CountTreesNear(Vector3 center, Tree[] allTrees)
+    List<Tree> GetTreesNear(Vector3 center, Tree[] allTrees)
     {
-        int count = 0;
+        List<Tree> nearbyTrees = new List<Tree>();
 
         foreach (Tree tree in allTrees)
         {
@@ -60,11 +62,11 @@ public class BirdManager : MonoBehaviour
 
             if (distance <= forestCheckRadius)
             {
-                count++;
+                nearbyTrees.Add(tree);
             }
         }
 
-        return count;
+        return nearbyTrees;
     }
 
     bool AlreadySpawnedNear(Vector3 position)
@@ -80,26 +82,28 @@ public class BirdManager : MonoBehaviour
         return false;
     }
 
-    void SpawnBirdFlock(Vector3 forestCenter)
+    void SpawnBirdFlock(Vector3 forestCenter, List<Tree> forestTrees)
     {
         for (int i = 0; i < birdsPerForest; i++)
         {
-            Vector2 offset =
-                Random.insideUnitCircle * birdFlockRadius;
+            Tree randomTree = forestTrees[Random.Range(0, forestTrees.Count)];
+
+            Vector2 offset = Random.insideUnitCircle * birdFlockRadius;
 
             Vector3 spawnPos =
-                forestCenter +
-                new Vector3(
-                    offset.x,
-                    offset.y,
-                    -0.5f
-                );
+                randomTree.transform.position +
+                new Vector3(offset.x, offset.y, -0.5f);
 
-            Instantiate(
+            GameObject birdObj = Instantiate(
                 birdPrefab,
                 spawnPos,
                 Quaternion.identity
             );
+
+            Bird bird = birdObj.GetComponent<Bird>();
+            bird.SetForestTrees(forestTrees);
+            bird.map = map;
+            bird.treePrefab = treePrefab;
         }
 
         Debug.Log("ÄñÈº³öÏÖ");

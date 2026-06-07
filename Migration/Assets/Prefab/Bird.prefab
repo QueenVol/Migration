@@ -104,3 +104,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3a8b3f3ddf44e0428537e6c2ec4ae22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bird
+  moveSpeed: 1
+  arriveDistance: 0.03
+  targetOffsetRadius: 0.15
+  lifeTime: 60
+  birdPrefab: {fileID: 8066048317270197343}
+  reproduceInterval: 12
+  reproduceChance: 0.35
+  minTreesToReproduce: 30
+  forestSearchRadius: 0.5
+  treePrefab: {fileID: 0}
+  map: {fileID: 0}
+  seedInterval: 8
+  seedChance: 0.45
+  seedRadius: 0.8

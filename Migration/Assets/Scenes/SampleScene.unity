@@ -508,8 +508,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BirdManager
   birdPrefab: {fileID: 8066048317270197343, guid: 0130f5c24650df145a439dea58f226bc, type: 3}
+  map: {fileID: 295671494}
+  treePrefab: {fileID: 4556592168865627335, guid: d5aa58e3fd1467743a63d38db5c435b0, type: 3}
   requiredTreeCount: 30
-  forestCheckRadius: 1.5
+  forestCheckRadius: 1
   checkInterval: 2
   birdSpawnOffset: 0.01
   birdsPerForest: 5
