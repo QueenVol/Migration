@@ -59,13 +59,21 @@ public class ForestManager : MonoBehaviour
     {
         int placed = 0;
         int attempts = 0;
-        int maxAttempts = treesPerPatch * 20;
+        int maxAttempts = treesPerPatch * 80;
+
+        float currentRadius = patchRadius;
 
         while (placed < treesPerPatch && attempts < maxAttempts)
         {
             attempts++;
 
-            Vector2 randomOffset = Random.insideUnitCircle * patchRadius;
+            // 每隔一段尝试，扩大一圈
+            if (attempts % 80 == 0)
+            {
+                currentRadius += 0.35f;
+            }
+
+            Vector2 randomOffset = Random.insideUnitCircle * currentRadius;
             Vector3 treePos = centerWorldPos + new Vector3(randomOffset.x, randomOffset.y, 0);
 
             if (!IsGrass(treePos))

@@ -494,7 +494,7 @@ MonoBehaviour:
   startingTreeCount: 30
   treesPerPatch: 12
   patchRadius: 0.2
-  minTreeDistance: 0.01
+  minTreeDistance: 0.05
 --- !u!114 &583565196
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -511,7 +511,6 @@ MonoBehaviour:
   requiredTreeCount: 30
   forestCheckRadius: 1.5
   checkInterval: 2
-  maxBirds: 8
   birdSpawnOffset: 0.01
   birdsPerForest: 5
   birdFlockRadius: 0.25
