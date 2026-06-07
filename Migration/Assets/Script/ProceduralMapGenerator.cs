@@ -267,4 +267,18 @@ public class ProceduralMapGenerator : MonoBehaviour
         if (mapTexture != null)
             mapTexture.Apply();
     }
+
+    public void SetTerrain(int x, int y, TerrainType type)
+    {
+        if (!InBounds(x, y))
+            return;
+
+        terrainMap[x, y] = type;
+        SetPixelColor(x, y, GetColor(type));
+    }
+
+    public void ApplyTexture()
+    {
+        ApplyMapTexture();
+    }
 }

@@ -211,4 +211,15 @@ public class GrassManager : MonoBehaviour
 
         return false;
     }
+
+    public void SetGrassAmountAtMapPosition(int x, int y, float amount)
+    {
+        if (grassAmount == null)
+            return;
+
+        if (!map.InBoundsPublic(x, y))
+            return;
+
+        grassAmount[x, y] = Mathf.Clamp(amount, 0f, maxGrass);
+    }
 }
