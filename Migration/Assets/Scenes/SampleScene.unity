@@ -479,6 +479,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TreePlacementSystem
   map: {fileID: 295671494}
   forestManager: {fileID: 583565195}
+  grassManager: {fileID: 583565198}
 --- !u!114 &583565195
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -493,6 +494,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ForestManager
   map: {fileID: 295671494}
   treePrefab: {fileID: 4556592168865627335, guid: d5aa58e3fd1467743a63d38db5c435b0, type: 3}
+  grassManager: {fileID: 583565198}
   startingTreeCount: 30
   treesPerPatch: 12
   patchRadius: 0.2
@@ -551,10 +553,11 @@ MonoBehaviour:
   map: {fileID: 295671494}
   maxGrass: 100
   regrowRate: 1.5
-  weakGrassThreshold: 35
+  weakGrassThreshold: 80
   healthyGrassColor: {r: 0.55, g: 0.85, b: 0.35, a: 1}
   weakGrassColor: {r: 0.72, g: 0.72, b: 0.25, a: 1}
-  barrenColor: {r: 0.62, g: 0.45, b: 0.25, a: 1}
+  barrenColor: {r: 0.6509804, g: 0.47843137, b: 0.2784314, a: 1}
+  plantableGrassThreshold: 5
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0

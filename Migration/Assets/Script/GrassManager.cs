@@ -16,6 +16,9 @@ public class GrassManager : MonoBehaviour
     public Color weakGrassColor = new Color(0.72f, 0.72f, 0.25f);
     public Color barrenColor = new Color(0.62f, 0.45f, 0.25f);
 
+    [Header("Planting")]
+    public float plantableGrassThreshold = 5f;
+
     private float[,] grassAmount;
 
     private void Start()
@@ -165,5 +168,47 @@ public class GrassManager : MonoBehaviour
             map.SetPixelColor(x, y, weakGrassColor);
         else
             map.SetPixelColor(x, y, healthyGrassColor);
+    }
+
+    public bool IsUsableGrass(Vector3 worldPos)
+    {
+        if (grassAmount == null)
+            return false;
+
+        Vector2Int mapPos = map.WorldToMap(worldPos);
+
+        if (!map.InBoundsPublic(mapPos.x, mapPos.y))
+            return false;
+
+        if (map.GetTerrain(mapPos.x, mapPos.y) != ProceduralMapGenerator.TerrainType.Grass)
+            return false;
+
+        return grassAmount[mapPos.x, mapPos.y] > plantableGrassThreshold;
+    }   
+
+    public bool HasUsableGrassNear(Vector3 worldPos, float worldRadius)
+    {
+        if (grassAmount == null)
+            return false;
+
+        Vector2Int center = map.WorldToMap(worldPos);
+        int pixelRadius = Mathf.RoundToInt(worldRadius * 32f);
+
+        for (int x = center.x - pixelRadius; x <= center.x + pixelRadius; x++)
+        {
+            for (int y = center.y - pixelRadius; y <= center.y + pixelRadius; y++)
+            {
+                if (!map.InBoundsPublic(x, y))
+                    continue;
+
+                if (map.GetTerrain(x, y) != ProceduralMapGenerator.TerrainType.Grass)
+                    continue;
+
+                if (grassAmount[x, y] > plantableGrassThreshold)
+                    return true;
+            }
+        }
+
+        return false;
     }
 }

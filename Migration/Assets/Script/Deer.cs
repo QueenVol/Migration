@@ -91,6 +91,9 @@ public class Deer : MonoBehaviour
 
     bool IsGrass(Vector3 worldPos)
     {
+        if (grassManager != null)
+            return grassManager.IsUsableGrass(worldPos);
+
         Vector2Int mapPos = map.WorldToMap(worldPos);
 
         return map.GetTerrain(mapPos.x, mapPos.y)

@@ -4,6 +4,7 @@ public class ForestManager : MonoBehaviour
 {
     public ProceduralMapGenerator map;
     public GameObject treePrefab;
+    public GrassManager grassManager;
 
     [Header("Initial Forest")]
     public int startingTreeCount = 30;
@@ -94,6 +95,9 @@ public class ForestManager : MonoBehaviour
 
     bool IsGrass(Vector3 worldPos)
     {
+        if (grassManager != null)
+            return grassManager.IsUsableGrass(worldPos);
+
         int mapX = Mathf.RoundToInt(worldPos.x * 32 + map.Width / 2);
         int mapY = Mathf.RoundToInt(worldPos.y * 32 + map.Height / 2);
 

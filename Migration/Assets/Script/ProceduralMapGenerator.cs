@@ -43,7 +43,7 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         FillBarren();
         DrawMountainBorder();
-        DrawRiver();
+        //DrawRiver();
         DrawGrassPatches();
 
         DrawTexture();
