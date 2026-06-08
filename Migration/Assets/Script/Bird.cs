@@ -22,6 +22,11 @@ public class Bird : MonoBehaviour
     [Header("Forest Detection")]
     public float forestSearchRadius = 2.0f;
 
+    [Header("Forest Survival")]
+    public int minTreesToSurvive = 10;
+    public float forestDeathCheckInterval = 2f;
+    public float survivalGraceTime = 5f;
+
     [Header("Seeding")]
     public GameObject treePrefab;
     public ProceduralMapGenerator map;
@@ -37,9 +42,20 @@ public class Bird : MonoBehaviour
     private List<Tree> forestTrees = new List<Tree>();
     private Vector3 targetPosition;
 
+    private float forestDeathCheckTimer;
+    private Vector3 homeForestCenter;
+    private bool hasHomeForest;
+
     public void SetForestTrees(List<Tree> trees)
     {
         forestTrees = trees;
+
+        if (trees != null && trees.Count > 0)
+        {
+            homeForestCenter = GetForestCenter(trees);
+            hasHomeForest = true;
+        }
+
         PickNewTarget();
     }
 
@@ -49,6 +65,7 @@ public class Bird : MonoBehaviour
         UpdateMovement();
         UpdateReproduction();
         UpdateSeeding();
+        UpdateForestSurvival();
     }
 
     void UpdateLife()
@@ -64,7 +81,14 @@ public class Bird : MonoBehaviour
     void UpdateMovement()
     {
         if (forestTrees == null || forestTrees.Count == 0)
-            return;
+        {
+            RefreshNearbyTrees();
+
+            if (forestTrees == null || forestTrees.Count == 0)
+                return;
+
+            PickNewTarget();
+        }
 
         Vector3 nextPos = Vector3.MoveTowards(
             transform.position,
@@ -142,6 +166,8 @@ public class Bird : MonoBehaviour
         babyBird.treePrefab = treePrefab;
         babyBird.map = map;
         babyBird.grassManager = grassManager;
+        babyBird.homeForestCenter = homeForestCenter;
+        babyBird.hasHomeForest = hasHomeForest;
     }
 
     void PickNewTarget()
@@ -149,9 +175,19 @@ public class Bird : MonoBehaviour
         RefreshNearbyTrees();
 
         if (forestTrees == null || forestTrees.Count == 0)
+        {
+            targetPosition = transform.position;
             return;
+        }
 
         Tree randomTree = forestTrees[Random.Range(0, forestTrees.Count)];
+
+        if (randomTree == null)
+        {
+            targetPosition = transform.position;
+            return;
+        }
+
         Vector2 offset = Random.insideUnitCircle * targetOffsetRadius;
 
         targetPosition = new Vector3(
@@ -164,12 +200,19 @@ public class Bird : MonoBehaviour
     void RefreshNearbyTrees()
     {
         Tree[] allTrees = FindObjectsOfType<Tree>();
-
         List<Tree> nearbyTrees = new List<Tree>();
+
+        Vector3 searchCenter = hasHomeForest ? homeForestCenter : transform.position;
 
         foreach (Tree tree in allTrees)
         {
-            float distance = Vector3.Distance(transform.position, tree.transform.position);
+            if (tree == null)
+                continue;
+
+            float distance = Vector3.Distance(
+                searchCenter,
+                tree.transform.position
+            );
 
             if (distance <= forestSearchRadius)
             {
@@ -177,9 +220,12 @@ public class Bird : MonoBehaviour
             }
         }
 
-        if (nearbyTrees.Count > 0)
+        forestTrees = nearbyTrees;
+
+        if (forestTrees.Count > 0)
         {
-            forestTrees = nearbyTrees;
+            homeForestCenter = GetForestCenter(forestTrees);
+            hasHomeForest = true;
         }
     }
 
@@ -199,6 +245,28 @@ public class Bird : MonoBehaviour
             return;
 
         TryPlantSeed();
+    }
+
+    void UpdateForestSurvival()
+    {
+        if (age < survivalGraceTime)
+            return;
+
+        forestDeathCheckTimer += Time.deltaTime;
+
+        if (forestDeathCheckTimer < forestDeathCheckInterval)
+            return;
+
+        forestDeathCheckTimer = 0f;
+
+        RefreshNearbyTrees();
+
+        Debug.Log("鸟附近树数量：" + forestTrees.Count);
+
+        if (forestTrees == null || forestTrees.Count < minTreesToSurvive)
+        {
+            Destroy(gameObject);
+        }
     }
 
     void TryPlantSeed()
@@ -247,5 +315,25 @@ public class Bird : MonoBehaviour
     {
         Collider2D hit = Physics2D.OverlapCircle(pos, 0.18f);
         return hit != null;
+    }
+
+    Vector3 GetForestCenter(List<Tree> trees)
+    {
+        Vector3 sum = Vector3.zero;
+        int count = 0;
+
+        foreach (Tree tree in trees)
+        {
+            if (tree == null)
+                continue;
+
+            sum += tree.transform.position;
+            count++;
+        }
+
+        if (count == 0)
+            return transform.position;
+
+        return sum / count;
     }
 }

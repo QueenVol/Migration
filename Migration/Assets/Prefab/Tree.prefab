@@ -142,6 +142,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tree
   grassManager: {fileID: 0}
-  deathDelay: 5
+  deathDelay: 0
   checkRadius: 0.1
   requiredGrassPixels: 20
