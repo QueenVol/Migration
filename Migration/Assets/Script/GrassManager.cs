@@ -322,4 +322,28 @@ public class GrassManager : MonoBehaviour
 
         return grassCount >= requiredGrassPixels;
     }
+
+    public int GetHealthyGrassCount()
+    {
+        if (grassAmount == null)
+            return 0;
+
+        int count = 0;
+
+        for (int x = 0; x < map.Width; x++)
+        {
+            for (int y = 0; y < map.Height; y++)
+            {
+                if (map.GetTerrain(x, y) != ProceduralMapGenerator.TerrainType.Grass)
+                    continue;
+
+                if (grassAmount[x, y] > weakGrassThreshold)
+                {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
 }

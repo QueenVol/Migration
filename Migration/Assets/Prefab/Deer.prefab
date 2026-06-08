@@ -111,8 +111,8 @@ MonoBehaviour:
   moveSpeed: 0.35
   moveRadius: 1.4
   arriveDistance: 0.05
-  eatInterval: 0.5
-  eatRadius: 1
+  eatInterval: 2
+  eatRadius: 0.3
   eatAmount: 25
   lifeTime: 90
   reproduceInterval: 15
