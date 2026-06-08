@@ -87,7 +87,7 @@ public class GrassManager : MonoBehaviour
         if (grassCreated > 0)
         {
             map.ApplyTexture();
-            Debug.Log($"ºþ²´×ÌÑø²ÝµØ£ºÐÂÔö {grassCreated} ¸ñ²Ý");
+            Debug.Log($"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÝµØ£ï¿½ï¿½ï¿½ï¿½ï¿½ {grassCreated} ï¿½ï¿½ï¿½");
         }
     }
 
@@ -142,7 +142,7 @@ public class GrassManager : MonoBehaviour
     {
         if (grassAmount == null)
         {
-            Debug.LogWarning("GrassManager: grassAmount »¹Ã»³õÊ¼»¯");
+            Debug.LogWarning("GrassManager: grassAmount ï¿½ï¿½Ã»ï¿½ï¿½Ê¼ï¿½ï¿½");
             return false;
         }
 
@@ -196,13 +196,13 @@ public class GrassManager : MonoBehaviour
             map.ApplyMapTexture();
 
             Debug.Log(
-                $"Â¹³Ô²Ý³É¹¦£ºÎ»ÖÃ {center}, ÏñËØÊý {eatenPixelCount}, ×ÜÏûºÄ {totalEatAmount:F1}, ×îµÍ²ÝÁ¿ {minGrassAfterEat:F1}"
+                $"Â¹ï¿½Ô²Ý³É¹ï¿½ï¿½ï¿½Î»ï¿½ï¿½ {center}, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ {eatenPixelCount}, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ {totalEatAmount:F1}, ï¿½ï¿½Í²ï¿½ï¿½ï¿½ {minGrassAfterEat:F1}"
             );
         }
         else
         {
             Debug.Log(
-                $"Â¹Ã»³Ôµ½²Ý£ºÎ»ÖÃ {center}, °ë¾¶ {pixelRadius}"
+                $"Â¹Ã»ï¿½Ôµï¿½ï¿½Ý£ï¿½Î»ï¿½ï¿½ {center}, ï¿½ë¾¶ {pixelRadius}"
             );
         }
 
@@ -283,5 +283,48 @@ public class GrassManager : MonoBehaviour
             return;
 
         grassAmount[x, y] = Mathf.Clamp(amount, 0f, maxGrass);
+    }
+
+    public bool HasEnoughGrassNearby(
+    Vector3 worldPos,
+    float radius,
+    int requiredGrassPixels
+)
+    {
+        Vector2Int center = map.WorldToMap(worldPos);
+
+        int pixelRadius =
+            Mathf.RoundToInt(radius * 32f);
+
+        int grassCount = 0;
+
+        for (int x = center.x - pixelRadius; x <= center.x + pixelRadius; x++)
+        {
+            for (int y = center.y - pixelRadius; y <= center.y + pixelRadius; y++)
+            {
+                if (!map.InBoundsPublic(x, y))
+                    continue;
+
+                float dist =
+                    Vector2.Distance(
+                        new Vector2(center.x, center.y),
+                        new Vector2(x, y)
+                    );
+
+                if (dist > pixelRadius)
+                    continue;
+
+                if (map.GetTerrain(x, y)
+                    != ProceduralMapGenerator.TerrainType.Grass)
+                    continue;
+
+                if (grassAmount[x, y] <= plantableGrassThreshold)
+                    continue;
+
+                grassCount++;
+            }
+        }
+
+        return grassCount >= requiredGrassPixels;
     }
 }

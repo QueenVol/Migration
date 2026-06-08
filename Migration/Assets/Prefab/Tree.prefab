@@ -141,5 +141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fdc0394921292840b908805cb830a3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tree
-  age: 0
-  mature: 0
+  grassManager: {fileID: 0}
+  deathDelay: 5
+  checkRadius: 0.1
+  requiredGrassPixels: 20

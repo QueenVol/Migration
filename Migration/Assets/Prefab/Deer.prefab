@@ -107,12 +107,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Deer
   map: {fileID: 0}
   grassManager: {fileID: 0}
+  deerPrefab: {fileID: 0}
   moveSpeed: 0.35
   moveRadius: 1.4
   arriveDistance: 0.05
   eatInterval: 0.5
   eatRadius: 0.3
   eatAmount: 25
+  lifeTime: 90
+  reproduceInterval: 15
+  reproduceChance: 0.35
+  reproduceRadius: 0.35
+  minGrassToReproduce: 30
 --- !u!58 &7807255484189756515
 CircleCollider2D:
   m_ObjectHideFlags: 0

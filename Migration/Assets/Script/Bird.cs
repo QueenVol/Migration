@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class Bird : MonoBehaviour
 {
+    public GrassManager grassManager;
+
     [Header("Movement")]
     public float moveSpeed = 0.6f;
     public float arriveDistance = 0.03f;
@@ -137,6 +139,9 @@ public class Bird : MonoBehaviour
         Bird babyBird = baby.GetComponent<Bird>();
         babyBird.SetForestTrees(forestTrees);
         babyBird.birdPrefab = birdPrefab;
+        babyBird.treePrefab = treePrefab;
+        babyBird.map = map;
+        babyBird.grassManager = grassManager;
     }
 
     void PickNewTarget()
@@ -216,9 +221,16 @@ public class Bird : MonoBehaviour
             if (HasNearbyTree(seedPos))
                 continue;
 
-            Instantiate(treePrefab, seedPos, Quaternion.identity);
+            GameObject treeObj = Instantiate(
+                treePrefab,
+                seedPos,
+                Quaternion.identity
+            );
 
-            Debug.Log("Äñ²¥ÖÖ£¬³¤³öÐÂÊ÷");
+            Tree tree = treeObj.GetComponent<Tree>();
+            tree.grassManager = grassManager;
+
+            Debug.Log("ï¿½ï¿½ï¿½Ö£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
             return;
         }
     }

@@ -2,23 +2,43 @@ using UnityEngine;
 
 public class Tree : MonoBehaviour
 {
-    public float age;
+    public GrassManager grassManager;
 
-    public bool mature;
+    [Header("Tree Survival")]
+    public float deathDelay = 15f;
+    public float checkRadius = 0.35f;
+    public int requiredGrassPixels = 20;
 
-    private void Start()
+    private float noGrassTimer;
+
+    void Update()
     {
-        age = 0;
-        mature = false;
+        CheckGrassSupport();
     }
 
-    private void Update()
+    void CheckGrassSupport()
     {
-        age += Time.deltaTime;
+        if (grassManager == null)
+            return;
 
-        if (age > 60f)
+        bool hasEnoughGrass =
+            grassManager.HasEnoughGrassNearby(
+                transform.position,
+                checkRadius,
+                requiredGrassPixels
+            );
+
+        if (hasEnoughGrass)
         {
-            mature = true;
+            noGrassTimer = 0f;
+            return;
+        }
+
+        noGrassTimer += Time.deltaTime;
+
+        if (noGrassTimer >= deathDelay)
+        {
+            Destroy(gameObject);
         }
     }
 }

@@ -46,11 +46,14 @@ public class ForestManager : MonoBehaviour
             if (HasNearbyTree(worldPos))
                 continue;
 
-            Instantiate(
+            GameObject treeObj = Instantiate(
                 treePrefab,
                 new Vector3(worldPos.x, worldPos.y, -1),
                 Quaternion.identity
             );
+
+            Tree tree = treeObj.GetComponent<Tree>();
+            tree.grassManager = grassManager;
 
             return;
         }
@@ -68,7 +71,7 @@ public class ForestManager : MonoBehaviour
         {
             attempts++;
 
-            // Ã¿¸ôÒ»¶Î³¢ÊÔ£¬À©´óÒ»È¦
+            // Ã¿ï¿½ï¿½Ò»ï¿½Î³ï¿½ï¿½Ô£ï¿½ï¿½ï¿½ï¿½ï¿½Ò»È¦
             if (attempts % 80 == 0)
             {
                 currentRadius += 0.35f;
@@ -83,11 +86,14 @@ public class ForestManager : MonoBehaviour
             if (HasNearbyTree(treePos))
                 continue;
 
-            Instantiate(
+            GameObject treeObj = Instantiate(
                 treePrefab,
                 new Vector3(treePos.x, treePos.y, -1),
                 Quaternion.identity
             );
+
+            Tree tree = treeObj.GetComponent<Tree>();
+            tree.grassManager = grassManager;
 
             placed++;
         }
