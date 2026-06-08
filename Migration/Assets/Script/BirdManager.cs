@@ -6,6 +6,7 @@ public class BirdManager : MonoBehaviour
     public GameObject birdPrefab;
     public ProceduralMapGenerator map;
     public GameObject treePrefab;
+    public GrassManager grassManager;
 
     [Header("Forest Requirement")]
     public int requiredTreeCount = 8;
@@ -103,9 +104,10 @@ public class BirdManager : MonoBehaviour
             Bird bird = birdObj.GetComponent<Bird>();
             bird.SetForestTrees(forestTrees);
             bird.map = map;
-            bird.treePrefab = treePrefab;   
+            bird.treePrefab = treePrefab;
+            bird.grassManager = grassManager;
         }
 
-        Debug.Log("ÄñÈº³öÏÖ");
+        Debug.Log("ï¿½ï¿½Èºï¿½ï¿½ï¿½ï¿½");
     }
 }

@@ -296,7 +296,10 @@ public class Bird : MonoBehaviour
             );
 
             Tree tree = treeObj.GetComponent<Tree>();
-            tree.grassManager = grassManager;
+            if (tree != null)
+            {
+                tree.grassManager = grassManager;
+            }
 
             Debug.Log("���֣���������");
             return;
@@ -305,6 +308,9 @@ public class Bird : MonoBehaviour
 
     bool IsGrass(Vector3 worldPos)
     {
+        if (grassManager != null)
+            return grassManager.IsUsableGrass(worldPos);
+
         int mapX = Mathf.RoundToInt(worldPos.x * 32 + map.Width / 2);
         int mapY = Mathf.RoundToInt(worldPos.y * 32 + map.Height / 2);
 

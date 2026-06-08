@@ -285,16 +285,13 @@ public class GrassManager : MonoBehaviour
         grassAmount[x, y] = Mathf.Clamp(amount, 0f, maxGrass);
     }
 
-    public bool HasEnoughGrassNearby(
-    Vector3 worldPos,
-    float radius,
-    int requiredGrassPixels
-)
+    public bool HasEnoughGrassNearby(Vector3 worldPos, float radius, int requiredGrassPixels)
     {
-        Vector2Int center = map.WorldToMap(worldPos);
+        if (grassAmount == null)
+            return false;
 
-        int pixelRadius =
-            Mathf.RoundToInt(radius * 32f);
+        Vector2Int center = map.WorldToMap(worldPos);
+        int pixelRadius = Mathf.RoundToInt(radius * 32f);
 
         int grassCount = 0;
 
@@ -305,17 +302,15 @@ public class GrassManager : MonoBehaviour
                 if (!map.InBoundsPublic(x, y))
                     continue;
 
-                float dist =
-                    Vector2.Distance(
-                        new Vector2(center.x, center.y),
-                        new Vector2(x, y)
-                    );
+                float dist = Vector2.Distance(
+                    new Vector2(center.x, center.y),
+                    new Vector2(x, y)
+                );
 
                 if (dist > pixelRadius)
                     continue;
 
-                if (map.GetTerrain(x, y)
-                    != ProceduralMapGenerator.TerrainType.Grass)
+                if (map.GetTerrain(x, y) != ProceduralMapGenerator.TerrainType.Grass)
                     continue;
 
                 if (grassAmount[x, y] <= plantableGrassThreshold)
