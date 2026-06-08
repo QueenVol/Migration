@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GrassManager : MonoBehaviour
@@ -24,9 +25,13 @@ public class GrassManager : MonoBehaviour
     public int lakeGrowthRadius = 10;
     public float lakeGrassChance = 0.2f;
 
-    private float lakeGrowthTimer;
+    [Header("Lake Life")]
+    public float waterCostPerGrass = 0.25f;
 
+    private float lakeGrowthTimer;
     private float[,] grassAmount;
+
+    private List<LakeData> lakes = new List<LakeData>();
 
     private void Start()
     {
@@ -69,29 +74,123 @@ public class GrassManager : MonoBehaviour
         }
     }
 
+    public void RegisterLake(Vector2Int center, int radius, float waterAmount)
+    {
+        lakes.Add(new LakeData(center, radius, waterAmount));
+        Debug.Log($"注册人工湖：中心 {center}, 半径 {radius}, 水量 {waterAmount}");
+    }
+
     void GrowGrassAroundLakes()
     {
         int grassCreated = 0;
 
-        for (int x = 0; x < map.Width; x++)
+        for (int i = lakes.Count - 1; i >= 0; i--)
         {
-            for (int y = 0; y < map.Height; y++)
-            {
-                if (map.GetTerrain(x, y) != ProceduralMapGenerator.TerrainType.River)
-                    continue;
+            LakeData lake = lakes[i];
 
-                TryGrowGrassNearLake(x, y, ref grassCreated);
+            if (lake.waterAmount <= 0f)
+            {
+                RemoveLake(lake);
+                lakes.RemoveAt(i);
+                continue;
+            }
+
+            int createdByThisLake = 0;
+
+            for (int x = lake.center.x - lake.radius; x <= lake.center.x + lake.radius; x++)
+            {
+                for (int y = lake.center.y - lake.radius; y <= lake.center.y + lake.radius; y++)
+                {
+                    if (!map.InBoundsPublic(x, y))
+                        continue;
+
+                    if (map.GetTerrain(x, y) != ProceduralMapGenerator.TerrainType.River)
+                        continue;
+
+                    TryGrowGrassNearLakePixel(x, y, ref createdByThisLake);
+                }
+            }
+
+            if (createdByThisLake > 0)
+            {
+                grassCreated += createdByThisLake;
+
+                lake.waterAmount -= waterCostPerGrass;
+                lake.waterAmount = Mathf.Max(0f, lake.waterAmount);
+
+                RemoveOuterWaterPixels(lake);
+            }
+
+            if (lake.waterAmount <= 0f || CountLakePixels(lake) <= 0)
+            {
+                RemoveLake(lake);
+                lakes.RemoveAt(i);
             }
         }
 
         if (grassCreated > 0)
         {
             map.ApplyTexture();
-            Debug.Log($"���������ݵأ����� {grassCreated} ���");
+            Debug.Log($"湖泊滋养草地：新增 {grassCreated} 格");
         }
     }
 
-    void TryGrowGrassNearLake(int lakeX, int lakeY, ref int grassCreated)
+    void RemoveOuterWaterPixels(LakeData lake)
+    {
+        int pixelsToRemove = Mathf.CeilToInt(waterCostPerGrass); // 多少像素消失
+        int removed = 0;
+
+        for (int r = lake.radius; r >= 0; r--)
+        {
+            for (int x = lake.center.x - r; x <= lake.center.x + r; x++)
+            {
+                for (int y = lake.center.y - r; y <= lake.center.y + r; y++)
+                {
+                    if (!map.InBoundsPublic(x, y))
+                        continue;
+
+                    if (map.GetTerrain(x, y) != ProceduralMapGenerator.TerrainType.River)
+                        continue;
+
+                    float dist = Vector2.Distance(
+                        new Vector2(lake.center.x, lake.center.y),
+                        new Vector2(x, y)
+                    );
+
+                    if (dist < r - 0.5f || dist > r + 0.5f)
+                        continue;
+
+                    map.SetTerrain(x, y, ProceduralMapGenerator.TerrainType.Barren);
+                    grassAmount[x, y] = 0f;
+
+                    removed++;
+                    if (removed >= pixelsToRemove)
+                        return;
+                }
+            }
+        }
+    }
+
+    int CountLakePixels(LakeData lake)
+    {
+        int count = 0;
+
+        for (int x = lake.center.x - lake.radius; x <= lake.center.x + lake.radius; x++)
+        {
+            for (int y = lake.center.y - lake.radius; y <= lake.center.y + lake.radius; y++)
+            {
+                if (!map.InBoundsPublic(x, y))
+                    continue;
+
+                if (map.GetTerrain(x, y) == ProceduralMapGenerator.TerrainType.River)
+                    count++;
+            }
+        }
+
+        return count;
+    }
+
+    void TryGrowGrassNearLakePixel(int lakeX, int lakeY, ref int grassCreated)
     {
         for (int attempt = 0; attempt < 8; attempt++)
         {
@@ -138,11 +237,40 @@ public class GrassManager : MonoBehaviour
         }
     }
 
+    void RemoveLake(LakeData lake)
+    {
+        for (int x = lake.center.x - lake.radius; x <= lake.center.x + lake.radius; x++)
+        {
+            for (int y = lake.center.y - lake.radius; y <= lake.center.y + lake.radius; y++)
+            {
+                if (!map.InBoundsPublic(x, y))
+                    continue;
+
+                float dist = Vector2.Distance(
+                    new Vector2(lake.center.x, lake.center.y),
+                    new Vector2(x, y)
+                );
+
+                if (dist > lake.radius)
+                    continue;
+
+                if (map.GetTerrain(x, y) == ProceduralMapGenerator.TerrainType.River)
+                {
+                    map.SetTerrain(x, y, ProceduralMapGenerator.TerrainType.Barren);
+                    grassAmount[x, y] = 0f;
+                }
+            }
+        }
+
+        map.ApplyTexture();
+        Debug.Log("人工湖枯竭");
+    }
+
     public bool EatGrass(Vector3 worldPos, float eatRadius, float eatAmount)
     {
         if (grassAmount == null)
         {
-            Debug.LogWarning("GrassManager: grassAmount ��û��ʼ��");
+            Debug.LogWarning("GrassManager: grassAmount 还没初始化");
             return false;
         }
 
@@ -150,9 +278,6 @@ public class GrassManager : MonoBehaviour
         int pixelRadius = Mathf.RoundToInt(eatRadius * 32f);
 
         bool ateSomething = false;
-        int eatenPixelCount = 0;
-        float totalEatAmount = 0f;
-        float minGrassAfterEat = maxGrass;
 
         for (int x = center.x - pixelRadius; x <= center.x + pixelRadius; x++)
         {
@@ -175,16 +300,8 @@ public class GrassManager : MonoBehaviour
                 if (grassAmount[x, y] <= 0f)
                     continue;
 
-                float before = grassAmount[x, y];
-
                 grassAmount[x, y] -= eatAmount;
                 grassAmount[x, y] = Mathf.Clamp(grassAmount[x, y], 0f, maxGrass);
-
-                float eaten = before - grassAmount[x, y];
-
-                eatenPixelCount++;
-                totalEatAmount += eaten;
-                minGrassAfterEat = Mathf.Min(minGrassAfterEat, grassAmount[x, y]);
 
                 UpdateGrassVisual(x, y);
                 ateSomething = true;
@@ -194,16 +311,6 @@ public class GrassManager : MonoBehaviour
         if (ateSomething)
         {
             map.ApplyMapTexture();
-
-            Debug.Log(
-                $"¹�Բݳɹ���λ�� {center}, ������ {eatenPixelCount}, ������ {totalEatAmount:F1}, ��Ͳ��� {minGrassAfterEat:F1}"
-            );
-        }
-        else
-        {
-            Debug.Log(
-                $"¹û�Ե��ݣ�λ�� {center}, �뾶 {pixelRadius}"
-            );
         }
 
         return ateSomething;
@@ -246,7 +353,7 @@ public class GrassManager : MonoBehaviour
             return false;
 
         return grassAmount[mapPos.x, mapPos.y] > plantableGrassThreshold;
-    }   
+    }
 
     public bool HasUsableGrassNear(Vector3 worldPos, float worldRadius)
     {

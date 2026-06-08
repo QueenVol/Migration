@@ -4,6 +4,7 @@ public class EnvironmentPlacementSystem : MonoBehaviour
 {
     public ProceduralMapGenerator map;
     public GrassManager grassManager;
+    public float lakeWaterAmount = 500f;
 
     [Header("Grass")]
     public float grassPatchRadius = 0.7f;
@@ -61,7 +62,7 @@ public class EnvironmentPlacementSystem : MonoBehaviour
             out centerWorldPos
         ))
         {
-            Debug.Log("¸½½üÃ»ÓĞ¿ÉÖÖ²İµÄÎ»ÖÃ");
+            Debug.Log("ï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ğ¿ï¿½ï¿½Ö²İµï¿½Î»ï¿½ï¿½");
             return;
         }
 
@@ -100,7 +101,7 @@ public class EnvironmentPlacementSystem : MonoBehaviour
         }
 
         map.ApplyTexture();
-        Debug.Log("ÖÖ²İÍê³É");
+        Debug.Log("ï¿½Ö²ï¿½ï¿½ï¿½ï¿½");
     }
 
     void PlaceLake(Vector3 centerWorldPos)
@@ -111,7 +112,7 @@ public class EnvironmentPlacementSystem : MonoBehaviour
             out centerWorldPos
         ))
         {
-            Debug.Log("¸½½üÃ»ÓĞ¿É½¨ºşµÄÎ»ÖÃ");
+            Debug.Log("ï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ğ¿É½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½");
             return;
         }
 
@@ -149,7 +150,12 @@ public class EnvironmentPlacementSystem : MonoBehaviour
         }
 
         map.ApplyTexture();
-        Debug.Log("ÈË¹¤ºş½¨ÔìÍê³É");
+        Debug.Log("äººå·¥æ¹–å»ºé€ å®Œæˆ");
+
+        if (grassManager != null)
+        {
+            grassManager.RegisterLake(center, pixelRadius, lakeWaterAmount);
+        }
     }
 
     bool TryFindNearestValidPoint(

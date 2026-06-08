@@ -842,6 +842,7 @@ MonoBehaviour:
   lakeGrowthInterval: 2
   lakeGrowthRadius: 100
   lakeGrassChance: 0.2
+  waterCostPerGrass: 5
 --- !u!114 &583565199
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -856,6 +857,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnvironmentPlacementSystem
   map: {fileID: 295671494}
   grassManager: {fileID: 583565198}
+  lakeWaterAmount: 500
   grassPatchRadius: 0.7
   lakeRadius: 0.5
 --- !u!114 &583565200
